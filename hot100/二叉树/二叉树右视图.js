@@ -5,19 +5,35 @@
 /**
  * 先了解二叉树的层序遍历
  */
-var rightSideView = function (root) {
+/**
+ * 
+在处理每一层时，记录该层的最后一个节点
+时间复杂度：O(n)，其中n是节点数
+空间复杂度：O(w)，其中w是树的最大宽度} root 
+ */
+function rightSideView_BFS(root) {
   if (!root) return []
+
+  const result = []
   const queue = [root]
-  const res = []
-  while (queue.length) {
-    let size = queue.length
-    // size长度为0的时候表明到了层级最后一个节点
-    while (size--) {
+
+  while (queue.length > 0) {
+    const levelSize = queue.length
+
+    // 遍历当前层的所有节点
+    for (let i = 0; i < levelSize; i++) {
       const node = queue.shift()
-      if (size == 0) res.push(node.val)
+
+      // 如果是当前层的最后一个节点，将其加入结果数组
+      if (i === levelSize - 1) {
+        result.push(node.val)
+      }
+
+      // 将下一层的节点加入队列
       if (node.left) queue.push(node.left)
       if (node.right) queue.push(node.right)
     }
   }
-  return res
+
+  return result
 }

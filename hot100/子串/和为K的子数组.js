@@ -4,6 +4,7 @@
  */
 /**
  *
+ *
  *可以使用前缀和和哈希表的组合方法来高效解决这个问题。前缀和是指数组中从第一个元素到当前元素的累加和。利用前缀和和哈希表，我们可以在 O(n) 时间复杂度内完成计算。
  *具体思路如下：
  *使用一个哈希表来存储前缀和出现的次数。
@@ -14,47 +15,37 @@
 /**
  * 解释
  * 初始化:
- * prefixSumCounts 哈希表用于记录前缀和出现的次数。初始化为 {0: 1} 表示前缀和为 0 的情况出现过一次。
- * currentSum 记录当前的前缀和。
- * count 记录和为 k 的子数组的个数。
- * 遍历数组:
- * 对于数组中的每个元素 num，累加到 currentSum。
- * 检查 currentSum - k 是否在 prefixSumCounts 中出现过。如果出现过，说明存在以当前元素为结尾的子数组，其和为 k，则将出现次数累加到 count。
- * 更新 prefixSumCounts 中当前前缀和 currentSum 的出现次数。
- * 返回结果:
+以下是算法的工作原理：
 
- * 最终返回 count，即和为 k 的子数组的个数。
- * 这种方法利用了前缀和和哈希表的特性，将问题转化为查找前缀和的出现次数，极大地提高了效率，时间复杂度为 O(n)。
+我们使用一个变量 sum 来保存当前的累积和。
+我们使用一个 Map 对象 map 来存储每个累积和出现的次数。
+我们初始化 map 使得 0 出现了一次，这是为了处理从数组开头开始的子数组。
+我们遍历数组，对于每个元素：
+
+更新累积和 sum
+检查 map 中是否存在 sum - k，如果存在，就将其出现的次数加到 count 上
+更新 map 中 sum 的出现次数
+
+这个算法的时间复杂度是 O(n)，其中 n 是数组的长度。空间复杂度也是 O(n)，因为在最坏的情况下，map 可能需要存储所有可能的累积和。
  */
 function subarraySum(nums, k) {
-  const prefixSumCounts = new Map()
-  prefixSumCounts.set(0, 1)
-
-  let currentSum = 0
   let count = 0
+  let sum = 0
+  const map = new Map()
+  map.set(0, 1) // 初始化map，处理从数组开头开始的子数组
 
-  for (let num of nums) {
-    console.log('num', num)
-    currentSum += num
-    console.log('currentSum', currentSum)
-
-    if (prefixSumCounts.has(currentSum - k)) {
-      count += prefixSumCounts.get(currentSum - k)
-      console.log('count', count)
+  for (let i = 0; i < nums.length; i++) {
+    sum += nums[i]
+    if (map.has(sum - k)) {
+      count += map.get(sum - k)
     }
-
-    if (prefixSumCounts.has(currentSum)) {
-      prefixSumCounts.set(currentSum, prefixSumCounts.get(currentSum) + 1)
-    } else {
-      prefixSumCounts.set(currentSum, 1)
-    }
-    console.log('prefixSumCounts', prefixSumCounts)
+    map.set(sum, (map.get(sum) || 0) + 1)
   }
 
   return count
 }
 
-// 示例用法
-const nums = [1, 2, 3, 0, 0, 2, 1]
-const k = 5
-console.log(subarraySum(nums, k))
+// 测试代码
+const nums = [1, 1, 1]
+const k = 2
+console.log(subarraySum(nums, k)) // 输出: 2
