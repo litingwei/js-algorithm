@@ -6,9 +6,9 @@
 要反转一个单链表，可以使用迭代的方法。通过遍历链表，将每个节点的 next 指针反向指向前一个节点，从而实现链表的反转。下面是详细的步骤和代码实现：
 
 迭代方法
-初始化三个指针：prev 为 null，curr 为 head，next 为 null。
+初始化三个指针：prev 为 null，curr 为 head，temp 为 null。
 遍历链表，在每次迭代中：
-保存当前节点的下一个节点 next = curr.next。
+保存当前节点的下一个节点 temp = curr.next。
 将当前节点的 next 指向 prev。
 将 prev 移动到当前节点。
 将 curr 移动到下一个节点。
@@ -21,7 +21,7 @@ prev 指向 null，表示反转后链表的初始前节点。
 curr 指向 head，表示当前节点。
 遍历链表：
 
-保存当前节点的下一个节点 next。
+保存当前节点的下一个节点 temp。
 将当前节点的 next 指针指向 prev，实现反转。
 移动 prev 和 curr，分别指向当前节点和下一个节点。
 返回新头节点：
@@ -34,10 +34,10 @@ function reverseList(head) {
   let curr = head
 
   while (curr !== null) {
-    let next = curr.next // 保存下一个节点
+    let temp = curr.next // 保存下一个节点
     curr.next = prev // 反转当前节点的指针
     prev = curr // 移动 prev 到当前节点
-    curr = next // 移动 curr 到下一个节点
+    curr = temp // 移动 curr 到下一个节点
   }
 
   return prev // prev 成为新的头节点

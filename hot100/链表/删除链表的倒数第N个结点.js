@@ -1,75 +1,81 @@
 /** 给你一个链表，删除链表的倒数第 n 个结点，并且返回链表的头结点。
  */
-/**
-要删除链表的倒数第 n 个节点，可以使用双指针技巧。具体步骤如下：
-
-初始化一个虚拟头节点（dummy），指向链表的头节点，以处理头节点被删除的情况。
-初始化两个指针（fast 和 slow），都指向虚拟头节点。
-先让快指针（fast）向前移动 n + 1 步，使快慢指针之间的距离为 n。
-然后同时移动快指针和慢指针，直到快指针到达链表末尾。
-此时，慢指针的下一个节点就是要删除的节点。
-删除该节点，并返回链表的头节点。
- */
-/**
-解释
-初始化虚拟头节点：
-
-dummy 是一个虚拟节点，用于简化操作，指向链表的头节点。
-fast 和 slow 都指向虚拟头节点。
-先让快指针移动 n + 1 步：
-
-通过循环，让快指针向前移动 n + 1 步。
-同时移动快指针和慢指针：
-
-快指针和慢指针同时向前移动，直到快指针到达链表末尾。
-此时，慢指针的下一个节点就是要删除的节点。
-删除节点：
-
-修改慢指针的 next 指针，跳过要删除的节点。
-返回新链表的头节点：
-
-返回 dummy.next，即新的链表头节点。
-这种方法的时间复杂度为 O(L)，其中 L 是链表的长度。空间复杂度为 O(1)，因为我们只使用了常数级别的额外空间。
- */
-function ListNode(val) {
-  this.val = val
-  this.next = null
+function ListNode(val, next) {
+  this.val = val === undefined ? 0 : val
+  this.next = next === undefined ? null : next
 }
 
-function removeNthFromEnd(head, n) {
-  const dummy = new ListNode(0)
+var removeNthFromEnd = function (head, n) {
+  // 创建一个虚拟头节点，值为-1，用于处理边界情况（比如删除第一个节点）
+  const dummy = new ListNode(-1)
+  // 将虚拟头节点连接到原链表
   dummy.next = head
-  let fast = dummy
-  let slow = dummy
 
-  // 先让快指针移动 n + 1 步
-  for (let i = 0; i <= n; i++) {
-    fast = fast.next
+  // latter指针指向虚拟头节点，用于找到要删除节点的前一个节点
+  let latter = dummy
+  // cur指针指向当前头节点，指向待删除的节点
+  let cur = head
+  // former指针指向头节点，用于先走n步
+  let former = head
+
+  // former指针先向前移动n步
+  for (let i = 0; i < n; i++) {
+    former = former.next
   }
 
-  // 然后同时移动快指针和慢指针
-  while (fast !== null) {
-    fast = fast.next
-    slow = slow.next
+  // former、latter和cur同时移动，直到former到达末尾
+  // 这样latter就能指向待删除节点的前一个节点
+  while (former) {
+    latter = latter.next
+    cur = cur.next
+    former = former.next
   }
 
-  // 此时慢指针的下一个节点就是要删除的节点
-  slow.next = slow.next.next
+  // 删除目标节点：将latter的next指向cur的下一个节点
+  latter.next = cur.next
 
+  // 返回新的头节点（去除虚拟头节点）
   return dummy.next
 }
 
-// 示例用法
-const head = new ListNode(1)
-head.next = new ListNode(2)
-head.next.next = new ListNode(3)
-head.next.next.next = new ListNode(4)
-head.next.next.next.next = new ListNode(5)
+/**
+ * 这段代码使用了快慢指针的思想，具体工作原理如下：
 
-const n = 2
-const newHead = removeNthFromEnd(head, n)
-let current = newHead
-while (current !== null) {
-  console.log(current.val) // 输出: 1 2 3 5
-  current = current.next
-}
+1. **创建虚拟头节点（dummy node）**：
+   - 通过创建值为-1的虚拟头节点，可以统一处理删除第一个节点和其他节点的情况
+   - 避免了需要特殊处理删除头节点的情况
+
+2. **设置三个指针**：
+   - `former`：快指针，用于先走n步
+   - `latter`：慢指针，最终会指向待删除节点的前一个节点
+   - `cur`：指向待删除的节点
+
+3. **指针移动过程**：
+   - 首先，`former`先向前移动n步
+   - 然后，`former`、`latter`和`cur`同时向前移动
+   - 当`former`到达链表末尾（为null）时，`cur`正好指向待删除的节点
+
+4. **删除节点**：
+   - 通过改变`latter.next = cur.next`完成节点的删除操作
+
+5. **返回结果**：
+   - 返回`dummy.next`作为新的头节点
+
+举个例子：
+```
+输入：1->2->3->4->5, n=2
+目标：删除倒数第2个节点（节点4）
+
+过程：
+1. 初始状态：dummy->1->2->3->4->5
+2. former先走2步：former指向3
+3. 同时移动直到former为null：
+   - former: 3->4->5->null
+   - latter: dummy->1->2->3
+   - cur: 1->2->3->4
+4. 删除节点4：latter.next = cur.next
+5. 最终结果：1->2->3->5
+```
+
+这种解法的时间复杂度是O(N)，空间复杂度是O(1)，其中N是链表的长度。
+ */
