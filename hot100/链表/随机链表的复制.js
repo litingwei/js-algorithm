@@ -15,62 +15,152 @@ random_index：随机指针指向的节点索引（范围从 0 到 n-1）；如�
 
 
  */
-/*
-深拷贝一个带有随机指针的链表，可以使用以下两种遍历的方法：
 
-复制每个节点并将其插入到原节点之后
-更新随机指针
-分离新旧链表
-具体步骤如下：
-
-遍历原链表，对于每个节点，创建一个新节点并插入到当前节点的后面，使得新节点紧跟在原节点之后。
-遍历链表，更新新节点的随机指针，使其指向对应的复制节点。
-分离新旧链表，将新节点提取出来形成新链表，并恢复原链表。
-*/
-/*
-特殊情况处理：如果原链表为空，直接返回空。
-复制节点并插入：
-遍历链表，对于每个节点，创建一个新节点，将其插入到当前节点之后。
-例如，原链表为 A -> B -> C，处理后变为 A -> A' -> B -> B' -> C -> C'。
-处理 random 指针：
-再次遍历链表，设置新节点的 random 指针。新节点的 random 指向原节点的 random 所指向的新节点。
-例如，如果 A.random -> C，则 A'.random -> C'。
-分离链表：
-再次遍历链表，分离出新链表，同时恢复原链表。
-例如，经过分离后，新链表为 A' -> B' -> C'，原链表恢复为 A -> B -> C。
-最终返回新链表的头节点。
-*/
-var copyRandomList = function (head) {
-  if (head === null) return null // 如果原链表为空，直接返回空
-
-  let cur = head
-
-  // 第一步：复制每个节点并将新节点插入到原节点之后
-  // 原链表为 A -> B -> C，处理后变为 A -> A' -> B -> B' -> C -> C'
-  while (cur) {
-    const n1 = cur.next
-    cur.next = new _Node(cur.val) // 创建新节点，值与当前节点相同
-    cur.next.next = n1 // 将新节点插入到当前节点之后
-    cur = n1 // 移动到下一个原节点
+// 链表节点的定义
+class Node {
+  constructor(val, next = null, random = null) {
+    this.val = val
+    this.next = next
+    this.random = random
   }
-
-  // 第二步：处理 random 指针
-  let cur2 = head
-  while (cur2) {
-    cur2.next.random = cur2.random ? cur2.random.next : null // 新节点的 random 指向原节点的 random 所指向的新节点
-    cur2 = cur2.next.next // 跳过新节点，移动到下一个原节点
-  }
-
-  // 第三步：分离新链表，同时恢复原链表
-  let p1 = head
-  let headNew = head.next // 新链表的头节点
-  let p2 = headNew
-  while (p1) {
-    p1.next = p1.next.next // 恢复原链表的 next 指针
-    p1 = p1.next // 移动到下一个原节点
-    p2.next = p1 ? p1.next : null // 设置新链表的 next 指针
-    p2 = p2.next // 移动到下一个新节点
-  }
-
-  return headNew // 返回新链表的头节点
 }
+
+/**
+ * @param {Node} head
+ * @return {Node}
+ */
+function copyRandomList(head) {
+  if (!head) return null
+
+  // 第一步：在每个原始节点后创建一个新节点
+  let current = head
+  while (current) {
+    const newNode = new Node(current.val)
+    newNode.next = current.next
+    current.next = newNode
+    current = newNode.next
+  }
+
+  // 第二步：处理random指针
+  current = head
+  while (current) {
+    if (current.random) {
+      // current.next是新节点，current.random.next是random指向的节点的副本
+      current.next.random = current.random.next
+    }
+    current = current.next.next
+  }
+
+  // 第三步：分离原始链表和复制的链表
+  const dummy = new Node(0)
+  let newCurrent = dummy
+  current = head
+
+  while (current) {
+    // 保存下一个原始节点
+    const nextOrig = current.next.next
+
+    // 复制的节点
+    const copy = current.next
+    newCurrent.next = copy
+    newCurrent = copy
+
+    // 恢复原始链表
+    current.next = nextOrig
+    current = nextOrig
+  }
+
+  return dummy.next
+}
+
+// 测试代码
+function printList(head) {
+  const values = []
+  const randoms = []
+  let current = head
+  const nodeMap = new Map()
+  let index = 0
+
+  // 第一遍遍历：记录节点位置
+  while (current) {
+    nodeMap.set(current, index)
+    values.push(current.val)
+    current = current.next
+    index++
+  }
+
+  // 第二遍遍历：记录random指向
+  current = head
+  while (current) {
+    if (current.random) {
+      randoms.push(`${nodeMap.get(current)}->${nodeMap.get(current.random)}`)
+    } else {
+      randoms.push(`${nodeMap.get(current)}->null`)
+    }
+    current = current.next
+  }
+
+  return {
+    values: values.join(' -> '),
+    randoms: randoms.join(', '),
+  }
+}
+
+// 创建测试用例
+function createTestCase() {
+  const node1 = new Node(7)
+  const node2 = new Node(13)
+  const node3 = new Node(11)
+  const node4 = new Node(10)
+  const node5 = new Node(1)
+
+  node1.next = node2
+  node2.next = node3
+  node3.next = node4
+  node4.next = node5
+
+  node1.random = null
+  node2.random = node1
+  node3.random = node4
+  node4.random = node2
+  node5.random = node1
+
+  return node1
+}
+
+// 运行测试
+const original = createTestCase()
+console.log('Original List:', printList(original))
+
+const copied = copyRandomList(original)
+console.log('Copied List:', printList(copied))
+
+/** 
+这个解决方案采用了三步走的策略：
+
+1. 首先，在每个原始节点后面创建一个新节点，形成一个交错的链表。
+   - 比如原始链表是 A->B->C 变成 A->A'->B->B'->C->C'
+
+2. 然后，设置新节点的random指针
+   - 利用 `current.random.next` 找到对应的复制节点
+
+3. 最后，分离原始链表和复制的链表
+   - 把穿插的链表拆分成两个独立的链表
+   - 恢复原始链表的结构
+   - 得到复制链表的完整结构
+
+代码中还包含了测试用例和打印函数，可以验证复制是否成功。时间复杂度是O(n)，空间复杂度是O(1)（不考虑返回的新链表所需的空间）。
+
+你可以用以下方式测试这段代码：
+```javascript
+const original = createTestCase();
+const copied = copyRandomList(original);
+```
+
+要验证复制是否成功，可以检查：
+1. 复制链表中的节点值是否与原链表相同
+2. random指针的指向关系是否与原链表一致
+3. 复制链表的节点是否都是新的（不与原链表共享节点）
+
+需要我解释代码中的任何具体部分吗？
+*/
