@@ -4,41 +4,28 @@
  * @param {*} height
  * @returns
  */
-/**
- * 要用双指针法解决这个问题，可以这样做：
+// 我来帮你实现求解盛最多水的容器问题，这个问题可以使用双指针方法高效解决。
 
- * 初始化两个指针，一个指向数组的开头，另一个指向数组的末尾。
- * 计算当前两个指针所形成的容器的容量，容量是两个指针指向的较小高度乘以指针之间的距离。
- * 更新最大容量。
- * 移动指针：移动指向较短垂线的那个指针，这样有可能找到更高的垂线，从而增加容量。
- * 重复步骤2-4，直到两个指针相遇。
- */
 /**
- * 解释：
- *
- * 初始化 left 指针为 0，right 指针为 height.length - 1。
- * 使用一个循环，当 left 小于 right 时继续执行。
- * 计算当前容器的高度和宽度，高度取 height[left] 和 height[right] 的较小值，宽度是 right - left。
- * 计算当前容器的容量，并更新最大容量 maxWater。
- * 如果左边的高度较小，移动 left 指针；否则，移动 right 指针。
- * 最终返回最大容量 maxWater。
- * 这个方法的时间复杂度是 O(n)，因为每个元素最多被访问一次。
+ * @param {number[]} height
+ * @return {number}
  */
 function maxArea(height) {
+  let maxWater = 0
   let left = 0
   let right = height.length - 1
-  let maxWater = 0
 
   while (left < right) {
+    // 计算当前容器的宽度
+    const width = right - left
+    // 容器的高度取决于较短的那条垂线
+    const h = Math.min(height[left], height[right])
     // 计算当前容器的容量
-    const currentHeight = Math.min(height[left], height[right])
-    const currentWidth = right - left
-    const currentWater = currentHeight * currentWidth
-
+    const area = width * h
     // 更新最大容量
-    maxWater = Math.max(maxWater, currentWater)
+    maxWater = Math.max(maxWater, area)
 
-    // 移动指针
+    // 移动较短的那条垂线
     if (height[left] < height[right]) {
       left++
     } else {
@@ -49,7 +36,54 @@ function maxArea(height) {
   return maxWater
 }
 
-// 示例用法
-const height = [1, 8, 6, 2, 5, 4, 8, 3, 7]
-const result = maxArea(height)
-console.log(result) // 输出: 49
+// 测试用例
+console.log(maxArea([1, 8, 6, 2, 5, 4, 8, 3, 7]))
+// 输出: 49
+// 解释: 在上面的例子中，容器的宽度为 8，高度取决于较短的垂线高度 7，
+// 所以最大容量为 8 * 7 = 49
+
+console.log(maxArea([1, 1]))
+// 输出: 1
+// 解释: 容器宽度为 1，高度为 1，容量为 1
+
+console.log(maxArea([4, 3, 2, 1, 4]))
+// 输出: 16
+// 解释: 使用第一个和最后一个高度为4的垂线，宽度为4，容量为16
+
+console.log(maxArea([1, 2, 4, 3]))
+// 输出: 4
+// 解释: 使用高度2和3的垂线，宽度为2，容量为4
+
+/**
+ * 这个解决方案使用双指针方法，具体思路如下：
+ *
+1. 初始化：
+   - 使用两个指针 left 和 right，分别指向数组的开始和结束
+   - 初始化最大水量 maxWater 为 0
+
+2. 算法步骤：
+   - 计算当前两个指针之间可以储存的水量
+   - 水量 = 宽度(right - left) × 高度(两个指针指向的高度中的较小值)
+   - 更新最大水量
+   - 移动指针：始终移动指向较短垂线的那个指针
+
+3. 为什么这样移动指针是正确的：
+   - 容器的容量受限于较短的那条垂线
+   - 如果移动指向较高垂线的指针，由于宽度减小，而高度不可能超过当前较短的垂线，所以容量一定会减小
+   - 只有移动指向较短垂线的指针，才可能得到更大的容量
+
+算法复杂度分析：
+- 时间复杂度：O(n)，只需要遍历一次数组
+- 空间复杂度：O(1)，只使用了常数额外空间
+
+特殊情况处理：
+- 处理数组长度为2的情况
+- 处理所有高度相同的情况
+- 处理单调递增或递减的情况
+
+关键优化：
+- 不需要考虑所有可能的组合
+- 利用双指针方法，每次都排除掉不可能成为最优解的情况
+- 通过移动较短的垂线来寻找可能的更大容量
+
+需要我解释算法的某个具体部分，或者你想了解其他实现方式吗？*/

@@ -3,28 +3,64 @@
  * @param {*} strs
  * @returns
  */
-/**
- * 
- * 解释：
- * 要解决这个问题，我们可以利用字母异位词的一个特性：当两个单词是字母异位词时，它们的字符排序后得到的字符串是相同的。
- * 我们可以利用这个特性，将字符排序后的字符串作为键，将字母异位词组合在一起。
+// 我来帮你实现一个用JavaScript解决字母异位词分组的函数。
 
- * 创建一个空的Map，用于存储字母异位词的分组。
- * 遍历输入的字符串数组，对于每个字符串，将其字符排序后得到一个新的字符串。
- * 检查Map中是否已有这个排序后的字符串，如果没有，则创建一个新的列表。
-将原始字符串加入到对应的分组中。
-最后，将Map中的所有值（即字母异位词分组）转换为数组并返回。
-这个解决方案的时间复杂度是O(NKlogK)，其中N是字符串数组的长度，K是字符串的最大长度。排序操作的时间复杂度是O(KlogK)，我们对每个字符串执行一次排序操作。
+/**
+ * @param {string[]} strs
+ * @return {string[][]}
  */
-var groupAnagrams = function (strs) {
+function groupAnagrams(strs) {
+  // 创建一个Map来存储排序后的字符串和原始字符串的映射
   const map = new Map()
-  for (let str of strs) {
-    const sorted = str.split('').sort().join('')
-    if (!map.has(sorted)) {
-      map.set(sorted, [str])
+
+  // 遍历每个字符串
+  for (const str of strs) {
+    // 将字符串排序以获得唯一的key
+    const sortedStr = str.split('').sort().join('')
+
+    // 如果Map中已存在这个key，则将当前字符串添加到对应的数组中
+    // 如果不存在，则创建一个新数组
+    if (map.has(sortedStr)) {
+      map.get(sortedStr).push(str)
     } else {
-      map.get(sorted).push(str)
+      map.set(sortedStr, [str])
     }
   }
+
+  // 返回Map中所有的值（即分组后的字符串数组）
   return Array.from(map.values())
 }
+
+// 测试用例
+console.log(groupAnagrams(['eat', 'tea', 'tan', 'ate', 'nat', 'bat']))
+// 输出: [["eat","tea","ate"],["tan","nat"],["bat"]]
+
+console.log(groupAnagrams(['']))
+// 输出: [[""]]
+
+console.log(groupAnagrams(['a']))
+// 输出: [["a"]]
+
+/** 
+这个实现的主要思路是：
+
+1. 使用Map数据结构来存储分组结果
+2. 对于每个输入字符串：
+   - 将其字符排序，得到一个排序后的字符串作为key
+   - 使用这个key在Map中查找对应的组
+   - 如果找到，就将原始字符串加入该组
+   - 如果没找到，就创建一个新组
+3. 最后返回所有分组的数组
+
+算法的时间复杂度是O(n * k * log k)，其中n是字符串数组的长度，k是字符串的最大长度。
+
+这个实现可以处理以下几种情况：
+- 包含多个字母异位词的情况
+- 只有一个字符串的情况
+- 空字符串的情况
+
+需要注意的是：
+- 空字符串会被当作一个特殊情况处理
+- 输出的每个子数组中包含的是原始字符串，而不是排序后的字符串
+- 分组的顺序可以是任意的
+*/
